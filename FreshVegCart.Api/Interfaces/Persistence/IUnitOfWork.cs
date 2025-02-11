@@ -1,11 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using FreshVegCart.Api.Interfaces.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FreshVegCart.Api.Interfaces.Persistence;
 
 public interface IUnitOfWork
 {
 
-
+    public IProductRepository Products { get; }
+    public IUserRepository Users { get; }
+    public IOrderRepository Orders { get; }
+    public IOrderItemRepository OrderItems { get; }
+    public IUserAddressRepository UserAddresses { get; }
     int SaveChanges();
     /// <summary>
     /// Asynchronously saves all changes made in this context to the database.

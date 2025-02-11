@@ -1,8 +1,10 @@
+using FluentValidation;
 using FreshVegCart.Api.Data;
 using FreshVegCart.Api.Data.Repositories;
 using FreshVegCart.Api.Interfaces.Persistence;
 using FreshVegCart.Api.Interfaces.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>()
     .AddScoped<IUnitOfWork, UnitOfWork>();
 
 #endregion
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
 

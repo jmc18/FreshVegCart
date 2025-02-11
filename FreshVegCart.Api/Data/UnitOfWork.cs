@@ -1,12 +1,23 @@
 ﻿using FreshVegCart.Api.Interfaces.Persistence;
+using FreshVegCart.Api.Interfaces.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FreshVegCart.Api.Data;
 
-public class UnitOfWork(FreshVegCartDbContext dbContext) : IUnitOfWork, IAsyncDisposable
+public class UnitOfWork(FreshVegCartDbContext dbContext, IProductRepository productRepository, 
+    IUserRepository userRepository, 
+    IOrderRepository orderRepository, 
+    IOrderItemRepository orderItemRepository, 
+    IUserAddressRepository userAddressRepository) : IUnitOfWork, IAsyncDisposable
 {
     //private readonly FreshVegCartDbContext _dbContext = dbContext;
     private bool _disposed;
+
+    public IProductRepository Products => productRepository;
+    public IUserRepository Users => userRepository;
+    public IOrderRepository Orders => orderRepository;
+    public IOrderItemRepository OrderItems => orderItemRepository;
+    public IUserAddressRepository UserAddresses => userAddressRepository;
 
     public int SaveChanges()
     {
