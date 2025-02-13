@@ -11,5 +11,11 @@ public class DataMappingProfiles : Profile
         CreateMap<Product, ProductDto>().ReverseMap()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
+
+        CreateMap<AddressDto, UserAddress>().ReverseMap();
+
+        CreateMap<RegisterDto, User>()
+            .ForMember(u => u.IsActive, opt => opt.MapFrom(_ => true));
+        CreateMap<User, LoggedInUser>().ForMember(u => u.Token, opt => opt.Ignore());
     }
 }
