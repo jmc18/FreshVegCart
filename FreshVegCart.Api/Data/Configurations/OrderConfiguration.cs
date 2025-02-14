@@ -31,6 +31,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(o => o.Notes)
                .HasMaxLength(500); // Maximum length of 500 characters
+        builder.Property(o => o.AddressName).HasDefaultValue(string.Empty);
+        builder.Property(o => o.TotalItems).HasDefaultValue(0);
 
         builder.Property(o => o.Status)
                .IsRequired() // Status is required

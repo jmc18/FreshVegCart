@@ -11,6 +11,8 @@ public class Order
     public decimal TotalAmount { get; set; }
     public string Notes { get; set; }
     public string Status { get; set; } = nameof(OrderStatus.Placed);
+    public string AddressName { get; set; }
+    public int TotalItems { get; set; }
 
 
 

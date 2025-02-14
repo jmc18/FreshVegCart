@@ -2,6 +2,7 @@
 using FreshVegCart.Api.Data.Entities;
 using FreshVegCart.Api.Interfaces.Persistence;
 using FreshVegCart.Shared.Dtos;
+using FreshVegCart.Shared.RecordResults;
 using Microsoft.AspNetCore.Identity;
 
 namespace FreshVegCart.Api.Services;
@@ -88,5 +89,29 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UserSer
             var addresses = _mapper.Map<AddressDto[]>(await _unitOfWork.UserAddresses.GetUserAddressesAsync(userId, isActive));
             return ApiResult<AddressDto[]>.Success(addresses);
         }, "An error occurred while retrieving addresses.");
+    }
+}
+
+public class OrderService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<OrderService> logger)
+    : BaseService<OrderService>(unitOfWork, mapper, logger)
+{
+    public async Task<ApiResult> PlaceOrderAsync(PlaceOrderDto dto, Guid userId)
+    {
+        return await ExecuteAsync(async () =>
+        {
+            var order = _mapper.Map<Order>(dto);
+            await _unitOfWork.Orders.AddAsync(order);
+            return ApiResult.Success();
+        }, "An error occurred while placing order.");
+    }
+
+    public async Task GetUserOrdersAsync(Guid userId, int startIndex, int PageSize)
+    {
+
+    }
+
+    public async Task GetOrderItemsByOrderIdAsync(long orderId, Guid userId)
+    {
+
     }
 }

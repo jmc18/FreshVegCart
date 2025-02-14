@@ -4,6 +4,7 @@ using FreshVegCart.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FreshVegCart.Api.Data.Migrations
 {
     [DbContext(typeof(FreshVegCartDbContext))]
-    partial class FreshVegCartDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250214211057_AddNewPropertiesForOrderEntity")]
+    partial class AddNewPropertiesForOrderEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

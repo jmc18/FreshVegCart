@@ -1,4 +1,4 @@
-﻿namespace FreshVegCart.Shared.Dtos;
+﻿namespace FreshVegCart.Shared.RecordResults;
 
 public record ApiResult(bool IsSuccess, string? ErrorMessage)
 {

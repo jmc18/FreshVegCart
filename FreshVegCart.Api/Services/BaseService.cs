@@ -9,7 +9,7 @@ public abstract class BaseService<T>(IUnitOfWork unitOfWork, IMapper mapper, ILo
     public IMapper _mapper = mapper;
     public ILogger<T> _logger = logger;
 
-    protected async Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> action, string errorMessage)
+    protected async Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> action, string? errorMessage = "An error occurred.")
     {
         try
         {
