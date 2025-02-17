@@ -5,6 +5,10 @@ using FreshVegCart.Api.Interfaces.Persistence;
 using FreshVegCart.Api.Interfaces.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using FreshVegCart.Api.Data.Entities;
+using FreshVegCart.Api.Interfaces.Services;
+using FreshVegCart.Api.Services;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +33,17 @@ builder.Services.AddScoped<IUserRepository, UserRepository>()
 #endregion
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+
+#region Transient Services
+
+builder.Services.AddTransient<IAuthService, AuthService>()
+    .AddTransient<IProductService, ProductService>()
+    .AddTransient<IOrderService, OrderService>()
+    .AddTransient<IUserService, UserService>()
+    .AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
+
+#endregion
 
 var app = builder.Build();
 

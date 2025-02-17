@@ -22,6 +22,11 @@ public class BaseRepository<T>(FreshVegCartDbContext dbContext) : IAsyncReposito
         return await dbContext.Set<T>().FindAsync(id);
     }
 
+    public virtual async Task<T?> GetByIdAsync(long id)
+    {
+        return await dbContext.Set<T>().FindAsync(id);
+    }
+
     public virtual async Task<IReadOnlyList<T>> ListAllAsync()
     {
         return await dbContext.Set<T>().ToListAsync();

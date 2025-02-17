@@ -17,5 +17,8 @@ public class DataMappingProfiles : Profile
         CreateMap<RegisterDto, User>()
             .ForMember(u => u.IsActive, opt => opt.MapFrom(_ => true));
         CreateMap<User, LoggedInUser>().ForMember(u => u.Token, opt => opt.Ignore());
+        CreateMap<Order, OrderDto>()
+            .ForMember(dest => dest.TotalItems, opt => opt.MapFrom(src => src.OrderItems.Count))
+            .ReverseMap();
     }
 }

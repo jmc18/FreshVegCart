@@ -2,4 +2,4 @@
 
 namespace FreshVegCart.Shared.RecordResults;
 
-public record PlaceOrderDto(Guid UserAddressId, OrderItemSaveDto[] Items);
+public record PlaceOrderDto(Guid UserAddressId, Guid Address, string AddressName, OrderItemSaveDto[] Items);
