@@ -6,10 +6,10 @@ namespace FreshVegCart.Shared.Dtos;
 public class ChangePasswordDto
 {
     [Required(ErrorMessage = "Old password is required")]
-    public string OldPassword { get; set; }
+    public string OldPassword { get; set; } = null!;
     [Required(ErrorMessage = "New password is required")]
-    public string NewPassword { get; set; }
+    public string NewPassword { get; set; } = null!;
     [Required(ErrorMessage = "Confirm password is required"), Compare(nameof(NewPassword), ErrorMessage = "Passwords do not match")]
     [JsonIgnore]
-    public string ConfirmPassword { get; set; }
+    public string ConfirmPassword { get; set; } = null!;
 }

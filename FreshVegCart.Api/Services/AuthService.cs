@@ -14,10 +14,10 @@ public class AuthService(IUnitOfWork unitOfWork, IMapper mapper, IPasswordHasher
     {
         return await ExecuteAsync(async () =>
         {
-            var user = _mapper.Map<User>(dto);
+            var user = Mapper.Map<User>(dto);
             user.PasswordHash = passwordHasher.HashPassword(user, dto.Password);
-            await _unitOfWork.Users.AddAsync(user);
-            _logger.LogInformation("User {Email} registered successfully.", user.Email);
+            await UnitOfWork.Users.AddAsync(user);
+            Logger.LogInformation("User {Email} registered successfully.", user.Email);
             return ApiResult.Success();
         }, "An error occurred while registering user.");
     }
@@ -26,7 +26,7 @@ public class AuthService(IUnitOfWork unitOfWork, IMapper mapper, IPasswordHasher
     {
         return await ExecuteAsync(async () =>
         {
-            var user = await _unitOfWork.Users.GetByEmailAsync(dto.Username);
+            var user = await UnitOfWork.Users.GetByEmailAsync(dto.Username);
             if (user is null)
             {
                 return ApiResult<LoggedInUser>.Failure("User does not exist.");
@@ -38,7 +38,7 @@ public class AuthService(IUnitOfWork unitOfWork, IMapper mapper, IPasswordHasher
                 return ApiResult<LoggedInUser>.Failure("Incorrect password.");
             }
 
-            var loggedInUser = _mapper.Map<LoggedInUser>(user);
+            var loggedInUser = Mapper.Map<LoggedInUser>(user);
             return ApiResult<LoggedInUser>.Success(loggedInUser with { Token = "token" });
         }, "An error occurred while logging in user.");
     }
@@ -47,12 +47,12 @@ public class AuthService(IUnitOfWork unitOfWork, IMapper mapper, IPasswordHasher
     {
         return await ExecuteAsync(async () =>
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            var user = await UnitOfWork.Users.GetByIdAsync(userId);
             if (user is null) return ApiResult.Failure("User not found.");
             var verificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, dto.OldPassword);
             if (verificationResult != PasswordVerificationResult.Success) return ApiResult.Failure("Incorrect password.");
             user.PasswordHash = passwordHasher.HashPassword(user, dto.NewPassword);
-            await _unitOfWork.Users.UpdateAsync(user);
+            await UnitOfWork.Users.UpdateAsync(user);
             return ApiResult.Success();
         }, "An error occurred while changing password.");
     }

@@ -19,7 +19,7 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<OrderS
                 return ApiResult.Failure("No items in order.");
             }
             var productIds = dto.Items.Select(x => x.ProductId).ToHashSet();
-            var products = await _unitOfWork.Products.GetProductsByIdsAsync(productIds);
+            var products = await UnitOfWork.Products.GetProductsByIdsAsync(productIds);
             if (products.Count < dto.Items.Length)
             {
                 return ApiResult.Failure("Some products were not found.");
@@ -49,28 +49,28 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<OrderS
                 OrderItems = orderItems
             };
 
-            await unitOfWork.Orders.AddAsync(order);
+            await UnitOfWork.Orders.AddAsync(order);
 
             return ApiResult.Success();
         }, "An error occurred while placing order.");
     }
 
-    public async Task<ApiResult<AddressDto[]>> GetUserOrdersAsync(Guid userId, int startIndex, int PageSize)
+    public async Task<ApiResult<OrderDto[]>> GetOrdersByUserIdAsync(Guid userId, int startIndex, int pageSize)
     {
-        var addresses = (await unitOfWork.UserAddresses.GetUserAddressesAsync(userId))
-            .OrderByDescending(x => x.Name)
+        var orders = (await UnitOfWork.Orders.GetOrdersByUserIdAsync(userId))
+            .OrderByDescending(x => x.Id)
             .Skip(startIndex)
-            .Take(PageSize)
+            .Take(pageSize)
             .ToArray();
 
-        return ApiResult<AddressDto[]>.Success(_mapper.Map<AddressDto[]>(addresses));
+        return ApiResult<OrderDto[]>.Success(Mapper.Map<OrderDto[]>(orders));
     }
 
     public async Task<ApiResult<OrderDto>> GetOrderItemsByOrderIdAsync(long orderId, Guid userId)
     {
-        var order = await unitOfWork.Orders.GetByIdAsync(orderId);
+        var order = await UnitOfWork.Orders.GetByIdAsync(orderId);
         if (order is null) return ApiResult<OrderDto>.Failure("Order not found.");
         if (order.UserId != userId) return ApiResult<OrderDto>.Failure("Order not found.");
-        return ApiResult<OrderDto>.Success(_mapper.Map<OrderDto>(order));
+        return ApiResult<OrderDto>.Success(Mapper.Map<OrderDto>(order));
     }
 }

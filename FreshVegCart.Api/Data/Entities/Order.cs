@@ -9,15 +9,13 @@ public class Order
     public Guid AddressId { get; set; }
     public DateTime OrderDate { get; set; }
     public decimal TotalAmount { get; set; }
-    public string Notes { get; set; }
+    public string Notes { get; set; } = string.Empty; // Initialize with an empty string
     public string Status { get; set; } = nameof(OrderStatus.Placed);
-    public string AddressName { get; set; }
+    public string AddressName { get; set; } = null!;
     public int TotalItems { get; set; }
-
-
 
     //Navigation Properties
     public virtual User User { get; set; } = null!;
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = [];
+    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>(); // Initialize with an empty list
     public virtual UserAddress Address { get; set; } = null!;
 }

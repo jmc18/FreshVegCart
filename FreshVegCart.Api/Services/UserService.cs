@@ -15,19 +15,19 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UserSer
         {
             if (dto.IsDefault)
             {
-                await _unitOfWork.UserAddresses.UnsetDefaultAddress(userId);
+                await UnitOfWork.UserAddresses.UnsetDefaultAddress(userId);
             }
             if (dto.Id != null)
             {
-                var userAddress = await _unitOfWork.UserAddresses.GetByIdAsync((Guid)dto.Id);
+                var userAddress = await UnitOfWork.UserAddresses.GetByIdAsync((Guid)dto.Id);
                 if (userAddress is null) return ApiResult.Failure("Address not found.");
-                await _unitOfWork.UserAddresses.UpdateAsync(mapper.Map(dto, userAddress));
+                await UnitOfWork.UserAddresses.UpdateAsync(Mapper.Map(dto, userAddress));
             }
             else
             {
-                var address = _mapper.Map<UserAddress>(dto);
+                var address = Mapper.Map<UserAddress>(dto);
                 address.UserId = userId;
-                await _unitOfWork.UserAddresses.AddAsync(address);
+                await UnitOfWork.UserAddresses.AddAsync(address);
             }
                 
             return ApiResult.Success();
@@ -38,7 +38,7 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UserSer
     {
         return await ExecuteAsync(async () =>
         {
-            var addresses = _mapper.Map<AddressDto[]>(await _unitOfWork.UserAddresses.GetUserAddressesAsync(userId, isActive));
+            var addresses = Mapper.Map<AddressDto[]>(await UnitOfWork.UserAddresses.GetUserAddressesAsync(userId, isActive));
             return ApiResult<AddressDto[]>.Success(addresses);
         }, "An error occurred while retrieving addresses.");
     }

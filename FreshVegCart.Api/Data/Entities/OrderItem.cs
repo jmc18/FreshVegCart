@@ -10,17 +10,17 @@ public class OrderItem
     #endregion
 
 
-    public string ProductName { get; set; }
+    public string ProductName { get; set; } = null!;
     public decimal ProductPrice { get; set; }
     public int Quantity { get; set; }
-    public string ProductImage { get; set; }
-    public string Unit { get; set; }
+    public string ProductImage { get; set; } = null!;
+    public string Unit { get; set; } = null!;
 
 
 
     #region Navigation Properties
 
-    public virtual Order Order { get; set; }
+    public virtual Order Order { get; set; } = null!;
     //public virtual Product Product { get; set; }
 
     #endregion

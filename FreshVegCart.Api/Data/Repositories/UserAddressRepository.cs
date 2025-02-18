@@ -6,9 +6,11 @@ namespace FreshVegCart.Api.Data.Repositories;
 
 public class UserAddressRepository(FreshVegCartDbContext dbContext) : BaseRepository<UserAddress>(dbContext), IUserAddressRepository
 {
+    private readonly FreshVegCartDbContext _dbContext = dbContext;
+
     public async Task UnsetDefaultAddress(Guid userId)
     {
-        var userAddress = await dbContext.UserAddresses.Where(x => x.UserId == userId && x.IsDefault).ToArrayAsync();
+        var userAddress = await _dbContext.UserAddresses.Where(x => x.UserId == userId && x.IsDefault).ToArrayAsync();
         if (userAddress.Length > 0)
         {
             foreach (var address in userAddress)
@@ -19,5 +21,5 @@ public class UserAddressRepository(FreshVegCartDbContext dbContext) : BaseReposi
         }
     }
 
-    public async Task<UserAddress[]> GetUserAddressesAsync(Guid userId, bool isActive = true) => await dbContext.UserAddresses.Where(x => x.UserId == userId && x.IsDeleted == !isActive).ToArrayAsync();
+    public async Task<UserAddress[]> GetUserAddressesAsync(Guid userId, bool isActive = true) => await _dbContext.UserAddresses.Where(x => x.UserId == userId && x.IsDeleted == !isActive).ToArrayAsync();
 }

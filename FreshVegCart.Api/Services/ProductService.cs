@@ -11,8 +11,8 @@ public class ProductService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Prod
     {
         return await ExecuteAsync(async () =>
         {
-            var products = await _unitOfWork.Products.GetProductsByStatusAsync(true);
-            return _mapper.Map<ProductDto[]>(products);
+            var products = await UnitOfWork.Products.GetProductsByStatusAsync(true);
+            return Mapper.Map<ProductDto[]>(products);
         }, "An error occurred while retrieving products.");
     }
 }

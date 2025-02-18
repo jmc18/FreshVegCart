@@ -55,7 +55,7 @@ public class UnitOfWork(FreshVegCartDbContext dbContext, IProductRepository prod
         {
             if (disposing)
             {
-                dbContext.DisposeAsync();
+               await dbContext.DisposeAsync();
             }
         }
         _disposed = true;

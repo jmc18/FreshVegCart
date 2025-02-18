@@ -1,20 +1,34 @@
 using FluentValidation;
 using FreshVegCart.Api.Data;
+using FreshVegCart.Api.Data.Entities;
 using FreshVegCart.Api.Data.Repositories;
+using FreshVegCart.Api.Endpoints;
 using FreshVegCart.Api.Interfaces.Persistence;
 using FreshVegCart.Api.Interfaces.Persistence.Repositories;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
-using FreshVegCart.Api.Data.Entities;
 using FreshVegCart.Api.Interfaces.Services;
 using FreshVegCart.Api.Services;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using System.Text.Json.Serialization;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "FreshVegCart API",
+        Version = "v1",
+        Description = "API for managing products, orders, and users in FreshVegCart."
+    });
+});
+
 
 builder.Services.AddDbContext<FreshVegCartDbContext>(options =>
 {
@@ -35,6 +49,12 @@ builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 
+builder.Services.Configure<JsonOptions>(options =>
+    options.SerializerOptions.DefaultIgnoreCondition =
+        JsonIgnoreCondition.WhenWritingNull);
+
+builder.Services.AddCors();
+
 #region Transient Services
 
 builder.Services.AddTransient<IAuthService, AuthService>()
@@ -45,13 +65,27 @@ builder.Services.AddTransient<IAuthService, AuthService>()
 
 #endregion
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "FreshVegCart API v1");
+    });
 }
+
+
+
+// global cors policy
+app.UseCors(x => x
+    .SetIsOriginAllowed(origin => true)
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials());
 
 using (var scope = app.Services.CreateScope())
 {
@@ -62,12 +96,18 @@ using (var scope = app.Services.CreateScope())
         await context.Database.MigrateAsync();
 }
 
+
 app.UseHttpsRedirection();
 
 
-app.Run();
+#region Set Endpoints
 
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+
+app.MapGet("/", () => "FreshVegCart API V1.0");
+
+app.MapProductEndpoints().MapOrderEndpoints().MapUserEndpoints().MapAuthEndpoints();
+#endregion
+
+
+
+app.Run();
