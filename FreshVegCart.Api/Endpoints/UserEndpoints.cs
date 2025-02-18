@@ -25,7 +25,7 @@ public static class UserEndpoints
             .Produces<AddressDto[]>()
             .WithName("GetAddress");
 
-        userGroup.MapPut("/addresses", async ([FromBody] ChangePasswordDto dto, [FromServices] IAuthService authService, [FromServices] ClaimsPrincipal principal)
+        userGroup.MapPut("/change-password", async ([FromBody] ChangePasswordDto dto, [FromServices] IAuthService authService, [FromServices] ClaimsPrincipal principal)
                 => Results.Ok(await authService.ChangePasswordAsync(dto, (Guid)principal.GetUserId())))
             .Produces<ApiResult>()
             .WithName("ChangePassword");

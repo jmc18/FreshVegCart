@@ -1,15 +1,22 @@
-﻿using AutoMapper;
+﻿using System.IdentityModel.Tokens.Jwt;
+using AutoMapper;
+using FreshVegCart.Api.Configurations;
 using FreshVegCart.Api.Data.Entities;
 using FreshVegCart.Api.Interfaces.Persistence;
 using FreshVegCart.Api.Interfaces.Services;
 using FreshVegCart.Shared.Dtos;
 using FreshVegCart.Shared.RecordResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FreshVegCart.Api.Services;
 
-public class AuthService(IUnitOfWork unitOfWork, IMapper mapper, IPasswordHasher<User> passwordHasher, ILogger<AuthService> logger) : BaseService<AuthService>(unitOfWork, mapper, logger), IAuthService
+public class AuthService(IUnitOfWork unitOfWork, IMapper mapper, IPasswordHasher<User> passwordHasher, ILogger<AuthService> logger, IOptions<JwtConfig> jwtOptions) : BaseService<AuthService>(unitOfWork, mapper, logger), IAuthService
 {
+    private readonly JwtConfig _jwtConfig = jwtOptions.Value;
     public async Task<ApiResult> RegisterAsync(RegisterDto dto)
     {
         return await ExecuteAsync(async () =>
@@ -39,8 +46,25 @@ public class AuthService(IUnitOfWork unitOfWork, IMapper mapper, IPasswordHasher
             }
 
             var loggedInUser = Mapper.Map<LoggedInUser>(user);
-            return ApiResult<LoggedInUser>.Success(loggedInUser with { Token = "token" });
+            return ApiResult<LoggedInUser>.Success(loggedInUser with { Token = GenerateJwtToken(user) });
         }, "An error occurred while logging in user.");
+    }
+
+    private string GenerateJwtToken(User user)
+    {
+        Claim[] claims = [
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Email, user.Email!),
+            new(ClaimTypes.Name, user.Name),
+        ];
+        var symmetricKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtConfig.SecretKey!));
+        var credentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(
+            issuer: _jwtConfig.Issuer,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(_jwtConfig.ExpirationInMinutes),
+            signingCredentials: credentials);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     public async Task<ApiResult> ChangePasswordAsync(ChangePasswordDto dto, Guid userId)

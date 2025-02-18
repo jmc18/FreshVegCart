@@ -11,7 +11,11 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using System.Text;
 using System.Text.Json.Serialization;
+using FreshVegCart.Api.Configurations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -66,6 +70,30 @@ builder.Services.AddTransient<IAuthService, AuthService>()
 #endregion
 
 
+builder.Services.AddOptions<JwtConfig>().BindConfiguration("Jwt");
+
+var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtConfig>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig!.SecretKey!)),
+        ValidateIssuer = true,
+        ValidIssuer = jwtConfig.Issuer,
+        ValidateAudience = false,
+    };
+});
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -99,6 +127,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication().UseAuthorization();
 
 #region Set Endpoints
 
